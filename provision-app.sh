@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e   # script stops if something fails
 REPO_URL="https://github.com/daria-dot/tech613-tictactoe.git"
-REPO_DIR="/home/ubuntu/tech613-tictactoe"
+
+REPO_DIR="$HOME/tech613-tictactoe"
 APP_DIR="$REPO_DIR/app"
 
 sudo apt update
@@ -28,6 +29,7 @@ sudo npm install -g pm2
 pm2 delete tictactoe 2>/dev/null || true
 pm2 start index.js --name tictactoe
 pm2 save
+sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u "$USER" --hp "$HOME"
 
 
 # Nginx reverse proxy (port 80 -> app on 3000)
