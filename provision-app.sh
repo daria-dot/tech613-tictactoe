@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e   # script stops if something fails
-REPO_URL="https://github.com/daria-dot/tech613-tictactoe.git"
 
+APP_USER="$(whoami)"
+export HOME="$(getent passwd "$APP_USER" | cut -d: -f6)"
+REPO_URL="https://github.com/daria-dot/tech613-tictactoe.git"
 REPO_DIR="$HOME/tech613-tictactoe"
 APP_DIR="$REPO_DIR/app"
 
@@ -17,7 +19,6 @@ else
     git clone "$REPO_URL" "$REPO_DIR"
 fi
 
-
 curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 sudo -E bash nodesource_setup.sh
 sudo apt install nodejs -y
@@ -29,8 +30,7 @@ sudo npm install -g pm2
 pm2 delete tictactoe 2>/dev/null || true
 pm2 start index.js --name tictactoe
 pm2 save
-sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u "$USER" --hp "$HOME"
-
+sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u "$APP_USER" --hp "$HOME"
 
 # Nginx reverse proxy (port 80 -> app on 3000)
 sudo apt install nginx -y
@@ -40,7 +40,7 @@ server {
     server_name _;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3000; #reroutes traffic from port 80 to 3000 on this machine
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -52,7 +52,3 @@ EOF
 sudo nginx -t
 sudo systemctl restart nginx
 sudo systemctl enable nginx
-
-
-
-
