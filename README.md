@@ -9,8 +9,11 @@ Requirements / assumptions:
 To run:
 
 ```linux```
+
 curl -fsSL https://raw.githubusercontent.com/daria-dot/tech613-tictactoe/main/provision-app.sh -o provision-app.sh
+
 chmod +x
+
 ./provision-app.sh
 ``````
 
