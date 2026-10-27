@@ -29,6 +29,13 @@ apt install -y mongodb-org
 # Config change: listen on all interfaces instead of only 127.0.0.1
 sed -i 's/^\(\s*bindIp:\).*/\1 0.0.0.0/' /etc/mongod.conf
 
+# Kernel fix: MongoDB 8.x refuses to start on Linux kernel 6.19+ (SERVER-121912).
+# This setting lets it run on those kernels; it does nothing on older kernels.
+mkdir -p /etc/systemd/system/mongod.service.d
+printf '[Service]\nEnvironment="GLIBC_TUNABLES=glibc.pthread.rseq=1"\n' \
+  > /etc/systemd/system/mongod.service.d/kernel-fix.conf
+systemctl daemon-reload
+
 # Start now and on every boot
 systemctl enable mongod
 systemctl restart mongod
